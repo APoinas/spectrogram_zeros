@@ -53,10 +53,9 @@ def Chirp(a, b, t):
     return np.exp(2 * 1j * np.pi * (a + b * t) * t)
 
 class Signal:
-    def __init__(self, par, duration=128, base=128, T0=None, T_length=16, fs=1):
+    def __init__(self, par, win_length=512, T0=None, T_length=16, fs=1):
         self.par = par
-        self.duration = duration
-        self.base = base
+        self.win_length = win_length
         self.T_length = T_length
         self.fs = fs
         if type(par["SNR"]) is list:
@@ -72,10 +71,7 @@ class Signal:
             if T0 is None:
                 self.T0 = 0
 
-        N = 4 * base
-        win_length = N
-
-        t = np.linspace(self.T0, self.T0 + T_length, N)
+        t = np.linspace(self.T0, self.T0 + T_length, win_length)
 
         if self.type == "Single_chirp":
             self.signal = np.sqrt(par["SNR"]) * Chirp(par["a"], par["b"], t)
@@ -84,20 +80,20 @@ class Signal:
         elif self.type == "Hermite":
             self.signal = np.sqrt(par["SNR"]) * hermite(par["k"])(t * np.sqrt(2 * np.pi)) * np.exp(-np.pi * t**2) / (np.pi**(1/4) * 2**(par["k"]/2) * np.sqrt(factorial(par["k"])))
 
-        w = np.sqrt(N / T_length) * (np.random.randn(N) + 1j*np.random.randn(N)) / np.sqrt(2)
+        w = np.sqrt(win_length / T_length) * (np.random.randn(win_length) + 1j*np.random.randn(win_length)) / np.sqrt(2)
         self.noise = w
-        g = sg.windows.gaussian(win_length, N/(T_length * np.sqrt(2*np.pi)))
+        g = sg.windows.gaussian(win_length, win_length/(T_length * np.sqrt(2*np.pi)))
 
         x0 = 2**(1/4) * (self.signal + w)
         f_spec, t_spec, spectro = sg.stft(x0, fs=fs, window=g, nperseg=win_length, noverlap=win_length-1, return_onesided=False)
         self.spectrogram = abs(spectro[np.argsort(f_spec),])**2
-        self.fmax = max(f_spec) * N / T_length
+        self.fmax = max(f_spec) * win_length / T_length
 
         y_zero, x_zero = extr2minth(self.spectrogram)
         y_max, x_max = extr2maxth(self.spectrogram)
         f_spec_sorted = f_spec[np.argsort(f_spec)]
-        self.zeros = np.vstack((self.T0 + self.T_length * x_zero/N, 2 * self.fmax * f_spec_sorted[y_zero])).T
-        self.max = np.vstack((self.T0 + self.T_length * x_max/N, 2 * self.fmax * f_spec_sorted[y_max])).T
+        self.zeros = np.vstack((self.T0 + self.T_length * x_zero/win_length, 2 * self.fmax * f_spec_sorted[y_zero])).T
+        self.max = np.vstack((self.T0 + self.T_length * x_max/win_length, 2 * self.fmax * f_spec_sorted[y_max])).T
 
     @property
     def s_b(self):
@@ -215,26 +211,3 @@ class Signal:
         ax.plot(x2, 2 * b * x2 + a2  -aa * np.sqrt(2) / s_b, color="yellow")
         ax.plot(-2 * b * y1 + (a1 + a2) * b - N0 * np.sqrt(2) / (aa * s_b), y1, color="yellow")
         ax.plot(-2 * b * y2 + (a1 + a2) * b - (N0 - 1) * np.sqrt(2) / (aa * s_b), y2, color="yellow")
-
-
-# sig = Signal({"SNR":100, "k":1})
-# sig.plot(plot_type=["theo"])
-# sig.plot(plot_type=["spectro"])
-# sig.plot(plot_type=["intensity"])
-
-# sig = Signal({"SNR":100, "a":-1, "b":0.4})
-# sig.plot(plot_type=["theo"])
-# sig.plot(plot_type=["spectro"])
-# sig.plot(plot_type=["intensity"])
-
-# sig = Signal({"SNR":[100, 40], "a":[-1, 0], "b":0.4}, T_length=15)
-# sig.plot(plot_type=["theo"])
-# sig.plot(plot_type=["spectro"])
-# sig.plot(plot_type=["intensity"])
-
-
-
-
-
-
-

@@ -2,60 +2,71 @@ Python code accompanying the paper `On two fundamental properties of the zeros o
 spectrograms of noisy signals <??????????????>`_ with 
 `Rémi Bardenet <https://rbardenet.github.io/>`_.
 
-The file "Signal.py" contains the function "MLEDPP" computing the asymptotic approximation of the MLE
-of common parametric families of stationnary DPPs and the function "Fisher_Info" computing the associated Fisher information matrix. The file "Estimator Comparison.R" gives examples
-of utilisation of the function "MLEDPP" as well as a way to reproduce the results of out paper. The file "Fisher IC.R" does the same for the function "Fisher_info".
+The file "Signal.py" contains the "Signal" class with the function needed to simulate the signals and associated spectrograms. An exemple of utilisation of these function
+is given in the file "Figures in the paper.ipynb", recreating the figures apppearing in the associated paper. The file "Generating_animations_video.py" contains some
+additional code to generate small videos showing how the zeros and local maxima of a noisy pair of paralle chirps behave when both chirps gets closer and closer from each other.
+An example of such video is shown in the file "Anim.avi".
 
-Instructions for the function MLEDPP
+The Signal class
 ------------------------------------
 
 Syntax
 ~~~~~~
 
-The full syntax of the MLEDPP function is the following
+The full syntax for defining an object of the Signal class is
 
-MLEDPP = function(ppp, DPPfamily, startpar=NULL, sigma=NULL, edgecorr=FALSE, Trunc=50)
+Signal(par, win_length=512, T0=None, T_length=16, fs=1)
 
-The main arguments are:
+The main argument is "par" corresponding to a dictionnary of the parameters for the intended signal:
 
-- ppp -> The observed point pattern, an object of class "ppp".
-- DPPfamily -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel", "Cauchy" or "Whittle-Matern".
+- For Hermite functions, "par" should be {"SNR":x, "k":y} where x is a positive float corresponding to the SNR of the singal and y is a positive int corresponding
+to the parameter of the Hermire function.
+- For a single linear chirp, "par" should be {"SNR":x, "a":y, "b":z} where x is a positive float corresponding to the SNR of the signal and y and z are floats corresponding
+to the parameter of the chirp.
+- For a pair of linear chirps, "par" should be {"SNR":[x_1, x_2], "a":[y_1, y_2], "b":z} where x_1 and x_2 are positive floats corresponding to the SNR of, respectively,
+the first and second chirp; y_1 and y_2 are floats corresponding to the intercept of the main axis of respectively, the first and second chirp; and z is a float
+corresponding to the common slope of both chirps.
 
-The additional arguments are:
+The optional arguments are:
 
-- startpar -> Optional. Initial value of alpha used in the optimization procedure. By default it is alpha_max/2 where alpha_max is the highest value of alpha for which the DPP is well-defined.
-- sigma -> Must be specified for "Whittle-Matern" families only. The shape parametric of the family (called nu in `dppMatern <https://rdrr.io/cran/spatstat.core/man/dppMatern.html>`__)
-- edgecorr -> Logical. If 'TRUE' and the observation window is rectangular, it computes the periodic edge correction. If 'TRUE' and the observation window isn't rectangular, it computes the experimental edge correction described in Section 5.3 of our paper.
-- Trunc -> Optional. Maximum truncation used for the computation of L_0 for all DPP families except Bessel.
+- win_length: int -> Length of the window vector.
+- T0: float -> Time at which the signal starts. By default it is 0 for chirps and -T_length/2 for Hermite functions
+- T_length: float -> Time length of the signal.
+- fs: float -> Sampling frequency
 
-The function returns an object of class "detpointprocfamily" corresponding to the DPP family fitted
-on the observed point pattern by the asymptotic approximation of the maximum likelihood estimator.
+The two main functions for elements of this class used for simulations are "Signal.plot" and "Signal.add_yellow_box"
 
-Limitations
-~~~~~~~~~~~
-
-Currently, the approximated MLE is coded for stationnary DPPs on any window of R^2 with either a Gaussian-type kernel, a Bessel-type kernel with sigma=0, a Cauchy-type kernel with nu=1/2 or a Whittle-Matern-type kernel with a fixed shape parameter.
-
-Instructions for the function Fisher_Info
+Instructions for the function Signal.plot
 -----------------------------------------
 
 Syntax
 ~~~~~~
 
-The full syntax of the Fisher_Info function is the following
+The full syntax of the function is the following
 
-Fisher_Info = function(ppp, DPPfamily, alpha_est, edgecorr=FALSE, Max_Trunc=50)
+plot(show_max=False, plot_type=["spectro", "intensity"])
 
 The main arguments are:
 
-- ppp -> The observed point pattern, an object of class "ppp".
-- DPPfamily -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
-- alpha_est -> The estimator of alpha obtained by maximum likelihood estimation.
+- show_max: bool -> The observed point pattern, an object of class "ppp".
+- plot_type: str list -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
 
-The additional arguments are:
+The function returns a 2x2 matrix corresponding to the Fisher Information matrix for the parameters (rho, alpha) of classical stationnary DPP families.
 
-- edgecorr -> Logical. If 'TRUE' and the observation window is rectangular, it computes the periodic edge correction. If 'TRUE' and the observation window isn't rectangular, it computes the experimental edge correction described in Section 5.3 of our paper.
-- Max_Trunc -> Optional. Maximum truncation used for the computation of L_0 for all DPP families except Bessel.
+Instructions for the function Signal.add_yellow_box
+-----------------------------------------
+
+Syntax
+~~~~~~
+
+The full syntax of the function is the following
+
+add_yellow_box(self, ax, N0)
+
+The main arguments are:
+
+- ax: bool -> The observed point pattern, an object of class "ppp".
+- N0: str list -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
 
 The function returns a 2x2 matrix corresponding to the Fisher Information matrix for the parameters (rho, alpha) of classical stationnary DPP families.
 
