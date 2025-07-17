@@ -48,14 +48,14 @@ Instructions for the function Signal.add_yellow_box
 
 The full syntax of the function is the following
 
-add_yellow_box(self, ax, N0)
+add_yellow_box(ax, N0)
 
 The main arguments are:
 
 - ax: Axes -> Axes object of a matplotlib plot.
 - N0: int -> The number of the rectangle where a zero is trapped between two chirps.
 
-The function returns nothing. It directly modify the Axes parameter to add a yellow rectangle corresponding to a rectangular trapping region for one of the zeros.
+The function returns nothing. It directly modifies the Axes parameter to add a yellow rectangle corresponding to a rectangular trapping region for one of the zeros.
 
 Dependencies
 ------------
@@ -67,7 +67,7 @@ This project was made with Python 3.10 and depends on the following packages:
 -  matplotlib 3.10
 -  cmocean 4.0
 
-The following dependencies are optional, and only needed for the video generation.
+The following dependencies are optional and only needed for the video generation.
 
 -  tqdm 4.67
 -  opencv 4.12
