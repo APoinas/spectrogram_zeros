@@ -19,13 +19,9 @@ Signal(par, win_length=512, T0=None, T_length=16, fs=1)
 
 The main argument is "par" corresponding to a dictionnary of the parameters for the intended signal:
 
-- For Hermite functions, "par" should be {"SNR":x, "k":y} where x is a positive float corresponding to the SNR of the singal and y is a positive int corresponding
-to the parameter of the Hermire function.
-- For a single linear chirp, "par" should be {"SNR":x, "a":y, "b":z} where x is a positive float corresponding to the SNR of the signal and y and z are floats corresponding
-to the parameter of the chirp.
-- For a pair of linear chirps, "par" should be {"SNR":[x_1, x_2], "a":[y_1, y_2], "b":z} where x_1 and x_2 are positive floats corresponding to the SNR of, respectively,
-the first and second chirp; y_1 and y_2 are floats corresponding to the intercept of the main axis of respectively, the first and second chirp; and z is a float
-corresponding to the common slope of both chirps.
+- For Hermite functions, "par" should be {"SNR":x, "k":y} where x is a positive float corresponding to the SNR of the singal and y is a positive int corresponding to the parameter of the Hermire function.
+- For a single linear chirp, "par" should be {"SNR":x, "a":y, "b":z} where x is a positive float corresponding to the SNR of the signal and y and z are floats corresponding to the parameter of the chirp.
+- For a pair of linear chirps, "par" should be {"SNR":[x_1, x_2], "a":[y_1, y_2], "b":z} where x_1 and x_2 are positive floats corresponding to the SNR of, respectively, the first and second chirp; y_1 and y_2 are floats corresponding to the intercept of the main axis of respectively, the first and second chirp; and z is a float corresponding to the common slope of both chirps.
 
 The optional arguments are:
 
@@ -48,10 +44,10 @@ plot(show_max=False, plot_type=["spectro", "intensity"])
 
 The main arguments are:
 
-- show_max: bool -> The observed point pattern, an object of class "ppp".
-- plot_type: str list -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
+- show_max: bool -> If the local maxima should be drawn on the noisy spectrogram or not.
+- plot_type: str list -> What type of plots should be drawn: "spectro" for the spectrogram of the noisy signal, "intensity" for the intensity of the zeros of the noisy spectrogram and "theo" for the spectrogram of the pure signal.
 
-The function returns a 2x2 matrix corresponding to the Fisher Information matrix for the parameters (rho, alpha) of classical stationnary DPP families.
+Returns a figure and axes object of a matplotlib plot.
 
 Instructions for the function Signal.add_yellow_box
 -----------------------------------------
@@ -65,8 +61,8 @@ add_yellow_box(self, ax, N0)
 
 The main arguments are:
 
-- ax: bool -> The observed point pattern, an object of class "ppp".
-- N0: str list -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
+- ax: Axes -> Axes object of a matplotlib plot.
+- N0: int -> The DPP family that is fitted to the data, it has to be either "Gauss", "Bessel" or "Cauchy".
 
 The function returns a 2x2 matrix corresponding to the Fisher Information matrix for the parameters (rho, alpha) of classical stationnary DPP families.
 
