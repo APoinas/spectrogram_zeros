@@ -4,7 +4,50 @@ import matplotlib.pyplot as plt
 import cmocean
 from scipy.special import hermite
 from math import factorial
-from utils import extr2minth, extr2maxth, spec_chirp, dens_chirp, spec_double_chirp, dens_double_chirp
+
+def extr2minth(M):
+    central = M[1:-1, 1:-1]
+    Bool = central <= M[2:, 1:-1]
+    Bool = np.logical_and(Bool, central <= M[:-2, 1:-1])
+    Bool = np.logical_and(Bool, central <= M[1:-1, 2:])
+    Bool = np.logical_and(Bool, central <= M[1:-1, :-2])
+    Bool = np.logical_and(Bool, central <= M[:-2, :-2])
+    Bool = np.logical_and(Bool, central <= M[:-2, 2:])
+    Bool = np.logical_and(Bool, central <= M[2:, 2:])
+    Bool = np.logical_and(Bool, central <= M[2:, :-2])
+
+    x, y = np.where(Bool)
+    return x+1, y+1
+
+def extr2maxth(M, Value=False):
+    central = M[1:-1, 1:-1]
+    Bool = central >= M[2:, 1:-1]
+    Bool = np.logical_and(Bool, central >= M[:-2, 1:-1])
+    Bool = np.logical_and(Bool, central >= M[1:-1, 2:])
+    Bool = np.logical_and(Bool, central >= M[1:-1, :-2])
+    Bool = np.logical_and(Bool, central >= M[:-2, :-2])
+    Bool = np.logical_and(Bool, central >= M[:-2, 2:])
+    Bool = np.logical_and(Bool, central >= M[2:, 2:])
+    Bool = np.logical_and(Bool, central >= M[2:, :-2])
+
+    x, y = np.where(Bool)
+
+    if Value:
+        val = M[x+1, y+1]
+        return x+1, y+1, val
+    return x+1, y+1
+
+def dens_chirp(x, SNR, s_b):
+    return ( 1 + 4 * SNR * np.pi * s_b * x**2 * np.exp(-2*np.pi*x**2) ) * np.exp( - SNR * s_b * np.exp(-2*np.pi*x**2) )
+
+def spec_chirp(x, SNR, s_b):
+    return SNR * s_b * np.exp(-2*np.pi*x**2)
+
+def spec_double_chirp(x, SNR1, SNR2, a, s_b, theta):
+    return s_b * (SNR1 * np.exp(-2 * np.pi * x**2) + SNR2 * np.exp(-2 * np.pi * (x-a)**2) + 2*np.sqrt(SNR1*SNR2)*np.exp(- np.pi * x**2 - np.pi * (x-a)**2)*np.cos(theta))
+
+def dens_double_chirp(x, SNR1, SNR2, a, theta, s_b):
+    return (1 + 4 * np.pi * s_b *(SNR1 * x**2*np.exp(-2 * np.pi * x**2) + SNR2 * (x-a)**2*np.exp(-2 * np.pi * (x-a)**2) + 2 * np.sqrt(SNR1*SNR2) * x*(x-a)*np.exp(- np.pi * x**2 - np.pi * (x-a)**2)*np.cos(theta)))*np.exp(-s_b * (SNR1 * np.exp(-2 * np.pi * x**2) + SNR2 * np.exp(-2 * np.pi * (x-a)**2) + 2*np.sqrt(SNR1*SNR2) * np.exp(- np.pi * x**2 - np.pi * (x-a)**2)*np.cos(theta)))
 
 def Chirp(a, b, t):
     return np.exp(2 * 1j * np.pi * (a + b * t) * t)
